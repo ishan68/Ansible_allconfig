@@ -1,0 +1,81 @@
+--- 
+- 
+  apt: "name={{ item }} update_cache=yes state=latest force_apt_get=yes"
+  loop: 
+    - aptitude
+  name: "Install prerequisites"
+- 
+  apt: "name={{ item }} update_cache=yes state=latest"
+  loop: 
+    - apache2
+    - php
+    - php-mysql
+    - libapache2-mod-php
+  name: "Install Apache and PHP Packages"
+- 
+  file: 
+    mode: "0755"
+    owner: "{{ app_user }}"
+    path: "/var/www/{{ http_host }}"
+    state: directory
+  name: "Create document root"
+- 
+  name: "Set up Apache virtualhost"
+  template: 
+    dest: "/etc/apache2/sites-available/{{ http_conf }}"
+    src: files/apache.conf.j2
+- 
+  name: "Enable new site"
+  shell: "/usr/sbin/a2ensite {{ http_conf }}"
+- 
+  name: "Disable default Apache site"
+  notify: "Reload Apache"
+  shell: "/usr/sbin/a2dissite 000-default.conf"
+  when: disable_default
+- 
+  name: "Sets Up PHP Info Page"
+  template: 
+    dest: "/var/www/{{ http_host }}/info.php"
+    src: files/info.php.j2
+- 
+  name: "Reload Apache"
+  service: 
+    name: apache2
+    state: reloaded
+- 
+  name: "Restart Apache"
+  service: 
+    name: apache2
+    state: restarted
+- 
+  apt: name=software-properties-common
+  name: "Installation install software-properties-common"
+- 
+  apt_repository: "repo=\"ppa:ondrej/php\""
+  name: "Repo PHP 7.4"
+- 
+  apt: update_cache=yes
+  name: "Updating the repo"
+- 
+  apt: "name=php7.4 state=present"
+  name: "Installation PHP 7.4"
+- 
+  apt: 
+    pkg: 
+      - php7.4-mysql
+      - php7.4-curl
+      - php7.4-json
+      - php7.4-cgi
+      - php7.4-xsl
+      - php7.4-cgi
+      - php7.4-gd
+      - php7.4-mbstring
+      - php7.4-zip
+      - php7.4-xmlrpc
+      - php7.4-soap
+      - php7.4-intl
+      - libapache2-mod-php
+    state: present
+    update_cache: true
+  name: "install lamp stack"
+

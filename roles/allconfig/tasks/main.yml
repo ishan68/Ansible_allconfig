@@ -1,0 +1,113 @@
+---
+- name: Install prerequisites
+  apt: name={{ item }} update_cache=yes state=latest force_apt_get=yes
+  loop: [ 'aptitude' ]
+- name: install pip3
+  apt: name=python3-pip state=present
+
+- name: Repo PHP 7.4
+  apt_repository:
+    repo="ppa:ondrej/php"
+
+- name: "Updating the repo"
+  apt: update_cache=yes
+
+- name: Installation PHP 7.4
+  apt: name=php7.4 state=present
+
+- name: install php modules
+  apt:
+    pkg:
+      - php7.4-mysql
+      - php7.4-curl
+      - php7.4-json
+      - php7.4-cgi
+      - php7.4-xsl
+      - php7.4-cgi
+      - php7.4-gd
+      - php7.4-mbstring
+      - php7.4-zip
+      - php7.4-xmlrpc
+      - php7.4-soap
+      - php7.4-intl
+      - libapache2-mod-php
+    state: present
+    update_cache: yes
+
+
+
+  #Apache Configuration
+- name: Install Apache and PHP Packages
+  apt: name={{ item }} update_cache=yes state=latest
+  loop: [ 'apache2', 'php7.4', 'php7.4-mysql', 'libapache2-mod-php7.4', 'python-pip', 'python-dev', 'build-essential',  ]
+
+- name: Create document root
+  file:
+    path: "/var/www/html/{{ http_host }}"
+    state: directory
+    owner: "{{ app_user }}"
+    mode: '0755'
+
+- name: Set up Apache virtualhost
+  template:
+    src: "files/apache.conf.j2"
+    dest: "/etc/apache2/sites-available/{{ http_conf }}"
+    
+- name: Enable new site
+  shell: /usr/sbin/a2ensite {{ http_conf }}
+  
+- name: Disable default Apache site
+  shell: /usr/sbin/a2dissite 000-default.conf
+  when: disable_default
+  notify: Reload Apache
+
+  # PHP Info Page
+- name: Sets Up PHP Info Page
+  template:
+    src: "files/info.php.j2"
+    dest: "/var/www/html/info.php"
+
+- name: Reload Apache
+  service:
+    name: apache2
+    state: reloaded
+
+- name: Restart Apache
+  service:
+    name: apache2
+    state: restarted
+- name: Change permission
+  file:
+    path: /var/www/html/
+    state: directory 
+    owner: www-data
+    group: www-data
+    mode: 0755
+
+
+- name: Installation install software-properties-common
+  apt: name=software-properties-common
+
+
+
+
+- name: install filezilla
+  apt:
+    name: filezilla
+
+- name: Install google-chrome
+  apt:
+    deb: https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+
+
+- name: Install skype
+  apt:
+    deb: https://go.skype.com/skypeforlinux-64.deb
+
+
+- name: Install sublime
+  apt:
+    deb: https://download.sublimetext.com/sublime-text_build-3211_amd64.deb
+ 
+- name: Installation Phpmyadmin
+  apt: name=phpmyadmin state=present

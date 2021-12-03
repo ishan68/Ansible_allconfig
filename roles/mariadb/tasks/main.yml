@@ -1,0 +1,35 @@
+---
+- name: Install prerequisites
+  apt: name={{ item }} update_cache=yes state=latest force_apt_get=yes
+  loop: [ 'aptitude' ]
+
+ #Install Mysql server
+- name: Install Mysql Packages
+  apt: name={{ item }} update_cache=yes state=latest
+  loop: [ 'mysql-server', 'python3-pymysql' ]
+
+# Start MariaDB Service
+- name: Start Mysql service
+  service:
+    name: mysql
+    state: started
+  become: true
+
+# MariaDB Configuration
+#- name: Sets the root password
+#  mysql_user:
+#    name: root
+#    password: "{{ mysql_root_password }}"
+#    login_unix_socket: /var/run/mysqld/mysqld.sock
+
+- name: update mysql root password for root account
+  mysql_user:
+    name: root
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+    host: 'localhost'
+    update_password: always
+    password: '{{ mysql_root_password }}'
+    priv: "*.*:ALL,GRANT"
+    check_implicit_admin: true
+
+

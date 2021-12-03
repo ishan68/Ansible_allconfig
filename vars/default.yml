@@ -1,0 +1,8 @@
+---
+mysql_root_password: "redhat"
+ansible_python_interpreter: /usr/bin/python3
+app_user: "root"
+http_host: "lampansible.com"
+http_conf: "lampansible.conf"
+http_port: "80"
+disable_default: true

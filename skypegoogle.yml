@@ -1,0 +1,7 @@
+---
+- name: configure lamp
+  hosts: seo
+  become: yes
+  become_method: sudo
+  roles:
+    - latest 

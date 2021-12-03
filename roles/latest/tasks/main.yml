@@ -1,0 +1,19 @@
+
+
+- name: Install latest google-chrome
+  apt:
+    deb: https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+
+
+    #- name: Install latest skype
+    # apt:
+    #deb: https://go.skype.com/skypeforlinux-64.deb
+
+
+    #- name: Install latest sublime
+    # apt:
+    #deb: https://download.sublimetext.com/sublime-text_build-3211_amd64.deb
+    #
+    #- name: Install latest upwork
+    #  apt:
+    # deb: https://upwork-usw2-desktopapp.upwork.com/binaries/v5_6_8_0_836f43f6f6be4149/upwork_5.6.8.0_amd64.deb
